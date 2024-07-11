@@ -1,78 +1,142 @@
-
 import 'package:banter/constants.dart';
+import 'package:banter/helper/show_Snackbar.dart';
+import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/widgets/custom_button.dart';
 import 'package:banter/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
+class SignUpScreen extends StatefulWidget {
+  SignUpScreen({Key? key}) : super(key: key);
+  static String id = 'signUpScreen';
 
-class SignUpScreen extends StatelessWidget {
-    const SignUpScreen({super.key});
-    static  String id = 'signUpScreen';
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  bool isLoading = false;
+
+  GlobalKey<FormState> formKey = GlobalKey();
+
+  String? email;
+
+  String? password;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Image.asset(
-                'assets/images/icon.png',
-                width: 250,
-                height: 250,
-              ),
-            ),
-            const CustomTextField(
-              text: 'Email',
-              hint: 'Enter your Email',
-              obscureText: false,
-            ),
-            const SizedBox(height: 20),
-            const CustomTextField(
-                text: 'Password',
-                hint: 'Enter your Password',
-                obscureText: true),
-            const SizedBox(height: 30),
-            Center(
-              child: CustomButton(
-                text: 'Sign Up',
-                onPressed: () {
-                  // Add your logic here
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return ModalProgressHUD(
+      inAsyncCall: isLoading,
+      child: Scaffold(
+        backgroundColor: kPrimaryColor,
+        body: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Already Have An Account ?',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                Center(
+                  child: Image.asset(
+                    'assets/images/icon.png',
+                    width: 250,
+                    height: 250,
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
+                CustomTextField(
+                  onChanged: (value) {
+                    email = value;
                   },
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  text: 'Email',
+                  hint: 'Enter your Email',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                    onChanged: (value) {
+                      password = value;
+                    },
+                    text: 'Password',
+                    hint: 'Enter your Password',
+                    obscureText: true),
+                const SizedBox(height: 30),
+                Center(
+                  child: CustomButton(
+                    text: 'Sign Up',
+                    onTAp: () async {
+                      if (formKey.currentState!.validate()) {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await SignUpNewUser();
+                          // Show success SnackBar only if no exception is caught
+                          ShowSnackBar(
+                              context,
+                              'Account Created Successfully .',
+                              Colors.greenAccent,
+                              Icons.check);
+                              Navigator.pushNamed(context, ChatScreen.id);
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'weak-password') {
+                            ShowSnackBar(
+                                context,
+                                'The password provided is too weak.',
+                                Colors.redAccent,
+                                Icons.error);
+                          } else if (e.code == 'email-already-in-use') {
+                            ShowSnackBar(context, 'The account already exists.',
+                                Colors.blueAccent, Icons.email);
+                          }
+                        }
+                        setState(
+                          () {
+                            isLoading = false;
+                          },
+                        );
+                      }
+                    },
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Already Have An Account ?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  ],
                 )
               ],
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> SignUpNewUser() async {
+    UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email!, password: password!);
   }
 }

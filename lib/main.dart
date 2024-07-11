@@ -1,4 +1,4 @@
-
+import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/screens/sign_in_screen.dart';
 import 'package:banter/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +21,11 @@ class Banter extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        'SignInScreen' : (context) => const SignInScreen(),
-        SignUpScreen.id :(context) => const SignUpScreen(),
+        SignInScreen.id: (context) => SignInScreen(),
+        SignUpScreen.id: (context) => SignUpScreen(),
+        ChatScreen.id: (context) => const ChatScreen(),
       },
-      initialRoute: 'SignInScreen',
+      initialRoute: SignInScreen.id,
     );
   }
 }
