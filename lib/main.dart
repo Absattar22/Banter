@@ -1,3 +1,4 @@
+import 'package:banter/helper/check_looged_status.dart';
 import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/screens/sign_in_screen.dart';
 import 'package:banter/screens/sign_up_screen.dart';
@@ -21,11 +22,12 @@ class Banter extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        SignInScreen.id: (context) =>  SignInScreen(),
+        SignInScreen.id: (context) =>  const SignInScreen(),
         SignUpScreen.id: (context) => const SignUpScreen(),
         ChatScreen.id: (context) => const ChatScreen(),
+        CheckAuth.id: (context) =>  const CheckAuth(),
       },
-      initialRoute: SignInScreen.id,
+      initialRoute: CheckAuth.id,
     );
   }
 }

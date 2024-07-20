@@ -6,6 +6,7 @@ import 'package:banter/widgets/custom_form_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -17,11 +18,10 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   bool isLoading = false;
-
+  bool _isObscured = true;
   GlobalKey<FormState> formKey = GlobalKey();
 
   String? email;
-
   String? password;
 
   @override
@@ -49,17 +49,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                   text: 'Email',
                   hint: 'Enter your Email',
-                  obscureText: false, isSignup: true,
+                  obscureText: false,
+                  isSignup: true,
                 ),
                 const SizedBox(height: 20),
                 CustomFormTextField(
-                    onChanged: (value) {
-                      password = value;
-                    },
-                    text: 'Password',
-                    hint: 'Enter your Password',
-                    obscureText: true , isSignup: true,),
-
+                  onChanged: (value) {
+                    password = value;
+                  },
+                  text: 'Password',
+                  hint: 'Enter your Password',
+                  obscureText: _isObscured,
+                  isSignup: true,
+                ),
                 const SizedBox(height: 30),
                 Center(
                   child: CustomButton(
@@ -72,10 +74,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         try {
                           await SignUpNewUser();
+
+                          // Save login status
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.setBool('isLoggedIn', true);
+
                           // Show success SnackBar only if no exception is caught
                           ShowSnackBar(
                               context,
-                              'Account Created Successfully .',
+                              'Account Created Successfully.',
                               Colors.greenAccent,
                               Icons.check);
                           Navigator.pushNamed(context, ChatScreen.id);
@@ -90,12 +98,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ShowSnackBar(context, 'The account already exists.',
                                 Colors.blueAccent, Icons.email);
                           }
-                        }
-                        setState(
-                          () {
+                        } finally {
+                          setState(() {
                             isLoading = false;
-                          },
-                        );
+                          });
+                        }
                       }
                     },
                   ),
@@ -104,7 +111,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Already Have An Account ?',
+                      'Already Have An Account?',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -136,7 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> SignUpNewUser() async {
-    UserCredential userCredential = await FirebaseAuth.instance
+    await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email!, password: password!);
   }
 }

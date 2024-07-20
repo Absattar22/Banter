@@ -1,4 +1,3 @@
-
 import 'package:banter/constants.dart';
 import 'package:banter/helper/show_Snackbar.dart';
 import 'package:banter/screens/chat_screen.dart';
@@ -8,6 +7,7 @@ import 'package:banter/widgets/custom_form_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -19,12 +19,9 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   String? email;
-
   String? password;
-
   bool isLoading = false;
-  
-
+  bool _isObscured = true;
 
   GlobalKey<FormState> formKey = GlobalKey();
 
@@ -63,7 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   },
                   text: 'Password',
                   hint: 'Enter your Password',
-                  obscureText: true,
+                  obscureText: _isObscured,
                   isSignup: false,
                 ),
                 const SizedBox(height: 30),
@@ -72,20 +69,24 @@ class _SignInScreenState extends State<SignInScreen> {
                     text: 'Sign In',
                     onTAp: () async {
                       if (formKey.currentState!.validate()) {
-                        setState(
-                          () {
-                            isLoading = true;
-                          },
-                        );
+                        setState(() {
+                          isLoading = true;
+                        });
                         try {
                           final credential = await SignInUser();
 
                           if (credential != null) {
-                            ShowSnackBar(context, 'You Sign In Successful.',
+                            ShowSnackBar(context, 'You signed in successfully.',
                                 Colors.greenAccent, Icons.check);
+
+                            // Save login status
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.setBool('isLoggedIn', true);
+
                             Navigator.pushNamed(context, ChatScreen.id);
                           } else {
-                            ShowSnackBar(context, 'You Sign In Failed.',
+                            ShowSnackBar(context, 'Sign in failed.',
                                 Colors.red, Icons.error);
                           }
                         } on FirebaseAuthException catch (e) {
@@ -93,17 +94,15 @@ class _SignInScreenState extends State<SignInScreen> {
                           if (e.code == 'user-not-found') {
                             message = 'No user found for that email.';
                           } else if (e.code == 'wrong-password') {
-                            message =
-                                'Invalid login credentials.'; 
+                            message = 'Invalid login credentials.';
                           } else {
-                            message = 'Icorrect Passoword';
+                            message = 'An error occurred. Please try again.';
                           }
                           ShowSnackBar(
                               context, message, Colors.red, Icons.error);
                         } finally {
                           setState(() {
-                            isLoading =
-                                false;
+                            isLoading = false;
                           });
                         }
                       }
@@ -114,7 +113,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Don\'t Have An Account ?',
+                      'Don\'t have an account?',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
