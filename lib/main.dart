@@ -21,8 +21,8 @@ class Banter extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        SignInScreen.id: (context) => SignInScreen(),
-        SignUpScreen.id: (context) => SignUpScreen(),
+        SignInScreen.id: (context) =>  SignInScreen(),
+        SignUpScreen.id: (context) => const SignUpScreen(),
         ChatScreen.id: (context) => const ChatScreen(),
       },
       initialRoute: SignInScreen.id,

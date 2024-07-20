@@ -2,14 +2,13 @@ import 'package:banter/constants.dart';
 import 'package:banter/helper/show_Snackbar.dart';
 import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/widgets/custom_button.dart';
-import 'package:banter/widgets/custom_text_field.dart';
+import 'package:banter/widgets/custom_form_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class SignUpScreen extends StatefulWidget {
-  SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
   static String id = 'signUpScreen';
 
   @override
@@ -44,22 +43,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     height: 250,
                   ),
                 ),
-                CustomTextField(
+                CustomFormTextField(
                   onChanged: (value) {
                     email = value;
                   },
                   text: 'Email',
                   hint: 'Enter your Email',
-                  obscureText: false,
+                  obscureText: false, isSignup: true,
                 ),
                 const SizedBox(height: 20),
-                CustomTextField(
+                CustomFormTextField(
                     onChanged: (value) {
                       password = value;
                     },
                     text: 'Password',
                     hint: 'Enter your Password',
-                    obscureText: true),
+                    obscureText: true , isSignup: true,),
+
                 const SizedBox(height: 30),
                 Center(
                   child: CustomButton(
@@ -78,7 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               'Account Created Successfully .',
                               Colors.greenAccent,
                               Icons.check);
-                              Navigator.pushNamed(context, ChatScreen.id);
+                          Navigator.pushNamed(context, ChatScreen.id);
                         } on FirebaseAuthException catch (e) {
                           if (e.code == 'weak-password') {
                             ShowSnackBar(

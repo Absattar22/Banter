@@ -1,15 +1,16 @@
+
 import 'package:banter/constants.dart';
 import 'package:banter/helper/show_Snackbar.dart';
 import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/screens/sign_up_screen.dart';
 import 'package:banter/widgets/custom_button.dart';
-import 'package:banter/widgets/custom_text_field.dart';
+import 'package:banter/widgets/custom_form_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class SignInScreen extends StatefulWidget {
-  SignInScreen({super.key});
+  const SignInScreen({super.key});
   static String id = 'signInScreen';
 
   @override
@@ -22,9 +23,10 @@ class _SignInScreenState extends State<SignInScreen> {
   String? password;
 
   bool isLoading = false;
+  
+
 
   GlobalKey<FormState> formKey = GlobalKey();
-
 
   @override
   Widget build(BuildContext context) {
@@ -45,22 +47,24 @@ class _SignInScreenState extends State<SignInScreen> {
                     height: 250,
                   ),
                 ),
-                CustomTextField(
+                CustomFormTextField(
                   onChanged: (value) {
                     email = value;
                   },
                   text: 'Email',
                   hint: 'Enter your Email',
                   obscureText: false,
+                  isSignup: false,
                 ),
                 const SizedBox(height: 20),
-                CustomTextField(
+                CustomFormTextField(
                   onChanged: (value) {
                     password = value;
                   },
                   text: 'Password',
                   hint: 'Enter your Password',
                   obscureText: true,
+                  isSignup: false,
                 ),
                 const SizedBox(height: 30),
                 Center(
@@ -68,32 +72,40 @@ class _SignInScreenState extends State<SignInScreen> {
                     text: 'Sign In',
                     onTAp: () async {
                       if (formKey.currentState!.validate()) {
-                        setState(() {
-                          isLoading = true;
-                        });
-
-                        try {
-                          await SignInUser();
-                          ShowSnackBar(context, 'You Sign In Successful.',
-                              Colors.greenAccent, Icons.check);
-                              Navigator.pushNamed(context, ChatScreen.id);
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'user-not-found') {
-                            ShowSnackBar(
-                                context,
-                                'No user found for that email.',
-                                Colors.red,
-                                Icons.error);
-                          } else if (e.code == 'wrong-password') {
-                            ShowSnackBar(context, 'Wrong password ', Colors.red,
-                                Icons.password_outlined);
-                          }
-                        }
                         setState(
                           () {
-                            isLoading = false;
+                            isLoading = true;
                           },
                         );
+                        try {
+                          final credential = await SignInUser();
+
+                          if (credential != null) {
+                            ShowSnackBar(context, 'You Sign In Successful.',
+                                Colors.greenAccent, Icons.check);
+                            Navigator.pushNamed(context, ChatScreen.id);
+                          } else {
+                            ShowSnackBar(context, 'You Sign In Failed.',
+                                Colors.red, Icons.error);
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          String message;
+                          if (e.code == 'user-not-found') {
+                            message = 'No user found for that email.';
+                          } else if (e.code == 'wrong-password') {
+                            message =
+                                'Invalid login credentials.'; 
+                          } else {
+                            message = 'Icorrect Passoword';
+                          }
+                          ShowSnackBar(
+                              context, message, Colors.red, Icons.error);
+                        } finally {
+                          setState(() {
+                            isLoading =
+                                false;
+                          });
+                        }
                       }
                     },
                   ),
@@ -133,8 +145,9 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Future<void> SignInUser() async {
+  Future<UserCredential> SignInUser() async {
     UserCredential userCredential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email!, password: password!);
+    return userCredential;
   }
 }
