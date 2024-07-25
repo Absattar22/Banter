@@ -3,7 +3,7 @@ import 'package:banter/helper/show_Snackbar.dart';
 import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/widgets/custom_button.dart';
 import 'package:banter/widgets/custom_form_text_field.dart';
-import 'package:banter/widgets/other_signin_option_buuton.dart';
+import 'package:banter/widgets/other_signin_option_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';

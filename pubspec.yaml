@@ -45,6 +45,7 @@ dependencies:
   google_sign_in: ^6.2.1
   flutter_facebook_auth: ^7.0.1
   flutter_login_facebook: ^2.0.1
+  http: ^1.2.2
 
 flutter_launcher_icons:
   android: "launcher_icon"
