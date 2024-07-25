@@ -4,8 +4,10 @@ import 'package:banter/screens/chat_screen.dart';
 import 'package:banter/screens/sign_up_screen.dart';
 import 'package:banter/widgets/custom_button.dart';
 import 'package:banter/widgets/custom_form_text_field.dart';
+import 'package:banter/widgets/other_signin_option_buuton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -86,8 +88,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
                             Navigator.pushNamed(context, ChatScreen.id);
                           } else {
-                            ShowSnackBar(context, 'Sign in failed.',
-                                Colors.red, Icons.error);
+                            ShowSnackBar(context, 'Sign in failed.', Colors.red,
+                                Icons.error);
                           }
                         } on FirebaseAuthException catch (e) {
                           String message;
@@ -135,6 +137,59 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     )
                   ],
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 10, right: 20),
+                          height: 1.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        'OR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 20, right: 10),
+                          height: 1.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                OtherSigninOptionButton(
+                  text: 'Sign in with Google',
+                  img: 'assets/images/google.png',
+                  onTap: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      await signInWithGoogle();
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          ChatScreen.id, (route) => false);
+                      ShowSnackBar(context, 'You signed in successfully.',
+                          Colors.greenAccent, Icons.check);
+                    } catch (e) {
+                      print('------------------------ $e');
+                      ShowSnackBar(
+                          context, 'Sign in failed.', Colors.red, Icons.error);
+                    } finally {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  },
                 )
               ],
             ),
@@ -148,5 +203,18 @@ class _SignInScreenState extends State<SignInScreen> {
     UserCredential userCredential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email!, password: password!);
     return userCredential;
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 }

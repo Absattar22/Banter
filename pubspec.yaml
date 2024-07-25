@@ -42,6 +42,9 @@ dependencies:
   chat_gpt_sdk: ^3.0.9
   dash_chat_2: ^0.0.21
   shared_preferences: ^2.2.3
+  google_sign_in: ^6.2.1
+  flutter_facebook_auth: ^7.0.1
+  flutter_login_facebook: ^2.0.1
 
 flutter_launcher_icons:
   android: "launcher_icon"

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
- 
-   CustomButton({super.key, required this.text, this.onTAp});
+  CustomButton({super.key, required this.text, this.onTAp});
 
   VoidCallback? onTAp;
-   final String text;
+  final String text;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -36,5 +35,6 @@ class CustomButton extends StatelessWidget {
         ),
       ),
     );
+    
   }
 }

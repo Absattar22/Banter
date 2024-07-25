@@ -25,7 +25,7 @@ void ShowSnackBar(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     ),
   );
 }
