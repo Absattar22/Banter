@@ -24,5 +24,15 @@ Banter is a sophisticated chat application designed to provide users with real-t
 
 https://github.com/user-attachments/assets/6a48fc04-8fba-49e1-b136-9b1e5c719bfe
 
+## Try it Now :
+https://www.upload-apk.com/ciVwOzJODDSHONS
+
+
+## Contact With Me :
+
+### zeyadabdelsattar@gmail.com
+or
+### https://www.linkedin.com/in/zeyad-abdelsattar-4942462bb/
+
 
 
