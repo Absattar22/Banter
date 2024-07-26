@@ -20,7 +20,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   String url =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyAADv208IreRY-_jHksI-bFfrVY9ajtWbI';
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=';
 
   ChatUser myself = ChatUser(
     id: '1',
@@ -193,7 +193,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         messageOptions: const MessageOptions(
-          containerColor: Color.fromARGB(255, 203, 197, 197),
+          containerColor: Color.fromARGB(255, 255, 255, 255),
           borderRadius: 20.0,
           showCurrentUserAvatar: false,
           showTime: true,
